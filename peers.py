@@ -22,12 +22,12 @@ from jujubigdata import utils
 class NameNodePeers(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{relation_name}.relation-joined')
+    @hook('{peers:namenode-cluster}.relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.joined')
 
-    @hook('{relation_name}.relation-departed')
+    @hook('{peers:namenode-cluster}.relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.joined')
