@@ -1,0 +1,4 @@
+name: namenode-cluster
+summary: Interface for HA NameNodes
+version: 1
+maintainer: "Big Data Team <bigdata@lists.ubuntu.com>"
