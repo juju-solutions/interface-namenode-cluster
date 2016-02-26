@@ -27,21 +27,32 @@ class NameNodePeers(RelationBase):
         conv = self.conversation()
         conv.set_state('{relation_name}.joined')
 
+    @hook('{peers:namenode-cluster}-relation-changed')
+    def changed(self):
+        conv = self.conversation()
+        if conv.get_remote('standby-ready'):
+            conv.set_state('{relation_name}.standby.ready')
+
     @hook('{peers:namenode-cluster}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.joined')
 
     def nodes(self):
-        node_names = [hookenv.local_unit().replace('/', '-')]
+        return sorted(list(conv.units)[0].replace('/', '-')
+                      for conv in self.conversations())
+
+    def standby_ready(self):
         for conv in self.conversations():
-            node_names.append(conv.scope.replace('/', '-'))
-        return sorted(node_names)[:2]  # only use the first two peers, if more
+            conv.set_remote('standby-ready', 'true')
 
     def hosts_map(self):
-        result = {}
+        local_host_name = hookenv.local_unit().replace('/', '-')
+        local_ip = utils.resolve_private_address(hookenv.unit_private_ip())
+        result = {local_ip: local_host_name}
         for conv in self.conversations():
-            ip = utils.resolve_private_address(conv.get_remote('private-address', ''))
-            host_name = conv.scope.replace('/', '-')
+            addr = conv.get_remote('private-address', '')
+            ip = utils.resolve_private_address(addr)
+            host_name = list(conv.units)[0].replace('/', '-')
             result.update({ip: host_name})
         return result
