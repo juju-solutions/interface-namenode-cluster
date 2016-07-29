@@ -38,6 +38,24 @@ class NameNodePeers(RelationBase):
         conv = self.conversation()
         conv.remove_state('{relation_name}.joined')
 
+    def clusternode_ready(self, fqdn):
+        for conv in self.conversations():
+            conv.set_remote('clusternode-ready', 'true')
+            conv.set_remote('fqdn', fqdn)
+
+    def cluster_nodes(self):
+        return sorted(conv.get_remote('fqdn')
+                      for conv in self.conversations() if conv.get_remote('clusternode-ready'))
+
+    def journalnode_ready(self, fqdn):
+        for conv in self.conversations():
+            conv.set_remote('journalnode-ready', 'true')
+            conv.set_remote('fqdn', fqdn)
+
+    def ready_nodes_with_journal(self):
+        return sorted(conv.get_remote('fqdn')
+                      for conv in self.conversations() if conv.get_remote('journalnode-ready'))
+
     def nodes(self):
         return sorted(list(conv.units)[0].replace('/', '-')
                       for conv in self.conversations())
