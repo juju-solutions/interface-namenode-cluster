@@ -14,9 +14,13 @@ This interface layer will set the following states, as appropriate:
 
   * `{relation_name}.joined` The NameNode is HA.  It can get information
     about the cluster with the following methods:
-      * `nodes()`  The list (max 2) of NameNode host names, including this one
-      * `hosts_map()`  The hosts mapping of all other NameNodes
+      * `nodes()` - depricated - The list of NameNode host names, including this one
+      * `cluster_nodes()` - The list of FQDNs of the namenode unit peers
+      * `ready_nodes_with_journal()` - The list of FQDNs of the namenode unit peers that have the journalnode-ready flag set
+      * `hosts_map()`  The hosts mapping of all other namenode units
 
+  * `clusternode_ready(fqdn)` and `journalnode_ready(fqdn)` signal the peers that the current
+     unit is ready and runs the journal node respectively
 
 # Contact Information
 
